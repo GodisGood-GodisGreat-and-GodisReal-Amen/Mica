@@ -47,9 +47,13 @@ export function textHash(t) {
   return (x >>> 0).toString(36) + ':' + t.length;
 }
 
-/* Moves large examples out of EXAMPLES into PACKED_EXAMPLES as raw deflate + base64. */
+/* Moves large examples out of EXAMPLES into PACKED_EXAMPLES as raw deflate +
+   base64. The code gets a placeholder for each payload and the payload goes in
+   after minification: zlib's output differs between machines, and esbuild picks
+   its short names from the characters of the whole input, so a payload in the
+   input would rename half the app from one machine to the next. */
 function packExamples(js, names = ['kernel']) {
-  const entries = [];
+  const entries = [], payloads = new Map();
   for (const name of names) {
     const open = `${name}: \``;
     const start = js.indexOf(open) + open.length;
@@ -57,11 +61,12 @@ function packExamples(js, names = ['kernel']) {
     if (start < open.length || end < 0) throw new Error(`example "${name}" not found in src/examples.js`);
     const text = js.slice(start, end);
     if (text.includes('${') || text.includes('\\')) throw new Error(`example "${name}" must not contain \${ or backslashes`);
-    const packed = deflateRawSync(Buffer.from(text), { level: 9, memLevel: 9 }).toString('base64');
-    entries.push(`${name}: ['${packed}', '${textHash(text)}']`);
+    const token = `__PACKED_${name.toUpperCase()}__`;
+    payloads.set(token, deflateRawSync(Buffer.from(text), { level: 9, memLevel: 9 }).toString('base64'));
+    entries.push(`${name}: ['${token}', '${textHash(text)}']`);
     js = js.slice(0, start - 1) + 'null' + js.slice(end + 1);
   }
-  return js + `\nconst PACKED_EXAMPLES = { ${entries.join(', ')} };\n`;
+  return { js: js + `\nconst PACKED_EXAMPLES = { ${entries.join(', ')} };\n`, payloads };
 }
 
 export async function build({ readable = false } = {}) {
@@ -73,7 +78,12 @@ export async function build({ readable = false } = {}) {
   if (!readable) {
     const { transformSync } = await import('esbuild');
     const min = (code, loader) => transformSync(code, { loader, minify: true, charset: 'utf8', legalComments: 'none' }).code.replace(/\n+$/, '');
-    js = min(packExamples(src('examples.js')) + '\n' + src('app.js'), 'js');
+    const packed = packExamples(src('examples.js'));
+    js = min(packed.js + '\n' + src('app.js'), 'js');
+    for (const [token, payload] of packed.payloads) {
+      if (js.split(token).length !== 2) throw new Error(`${token} should appear once in the minified code`);
+      js = js.replace(token, payload);
+    }
     css = min(css, 'css');
     head = minifyHtml(head.replace(/(<script>)([\s\S]*?)(<\/script>)/g, (m, open, code, close) => open + min(code, 'js') + close));
     body = minifyHtml(body);
