@@ -110,7 +110,9 @@ async function inChrome() {
   } finally {
     chrome.kill();
     await Promise.race([exited, new Promise(r => setTimeout(r, 3000))]);
-    rmSync(profile, { recursive: true, force: true, maxRetries: 3 });
+    /* The browser's helpers can still be writing to the profile; a folder left
+       in the temp directory must never hide the real result. */
+    try { rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); } catch (e) { /* left for the OS */ }
   }
 }
 
