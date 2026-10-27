@@ -1,0 +1,378 @@
+</style>
+</head>
+<body>
+
+<!-- ================================ HEADER ================================ -->
+<header class="app-header">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="2.5" y="9" width="12" height="12" rx="3.2" fill="currentColor" opacity=".38"/>
+      <rect x="6" y="6" width="12" height="12" rx="3.2" fill="currentColor" opacity=".66"/>
+      <rect x="9.5" y="3" width="12" height="12" rx="3.2" fill="currentColor"/>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-name">Mica</span>
+      <span class="brand-sub">a little virtual machine</span>
+    </div>
+  </div>
+
+  <div class="status-pill" id="statusPill" data-kind="ready" role="status" aria-live="polite">
+    <span class="led" aria-hidden="true"></span>
+    <span class="status-text" id="statusText">READY</span>
+  </div>
+
+  <div class="now-exec" id="nowExec" aria-live="off">
+    <svg class="now-arrow" viewBox="0 0 12 12" width="9" height="9" aria-hidden="true" focusable="false"><path d="M2.6 1.4 10.4 6 2.6 10.6Z" fill="currentColor"/></svg>
+    <span class="now-op" id="nowOp">idle</span>
+    <span class="now-vals" id="nowVals"></span>
+  </div>
+
+  <div class="header-meta">
+    <div class="meta"><span class="meta-k">cycles</span><span class="meta-v" id="cycleCount">0</span></div>
+    <div class="meta"><span class="meta-k">freq</span><span class="meta-v" id="ipsCounter">0</span></div>
+    <button class="icon-btn" id="themeQuick" type="button" aria-label="Switch light / dark theme" data-tip="Switch light / dark theme">
+      <svg class="ico-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <svg class="ico-moon" viewBox="-0.34 0.34 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="icon-btn" id="settingsToggle" type="button" aria-label="Open settings" aria-expanded="false" aria-controls="settingsDrawer" data-tip="Settings">
+      <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================================ EDITOR ================================ -->
+<section class="panel editor-panel" data-panel="editor" data-home="editor" style="--i:0">
+  <div class="panel-head" data-drag>
+    <span class="panel-title"><span class="led" data-led aria-hidden="true"></span>Editor</span>
+    <div class="tabs" role="tablist" aria-label="Editor mode" data-tabs="editor">
+      <button class="tab" role="tab" type="button" data-tab="asm" aria-selected="true" data-tip="The assembly program the virtual CPU runs">Assembly</button>
+      <button class="tab" role="tab" type="button" data-tab="host" aria-selected="false" data-tip="System console — plain JavaScript commands that drive the machine from above">System</button>
+      <button class="tab" role="tab" type="button" data-tab="hybrid" aria-selected="false" data-tip="Both languages in one script, sharing one machine">Hybrid</button>
+      <span class="tab-ink" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <!-- Assembly -->
+    <div class="tab-pane" data-pane="asm" role="tabpanel">
+      <div class="toolbar">
+        <label class="field">
+          <span class="field-k">Example</span>
+          <select id="exampleSelect" data-tip="Load an example program into the editor">
+            <option value="" disabled>your program</option>
+            <option value="counter">counter — 1..5</option>
+            <option value="fibonacci">fibonacci — first 10</option>
+            <option value="factorial">factorial — recursive 5!</option>
+            <option value="multiply">multiply — by loop</option>
+            <option value="memory">memory — write &amp; read</option>
+            <option value="bitwise">bitwise — AND/OR/XOR/SHL</option>
+            <option value="kernel">★ kernel — shell + stdlib</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-k">Saved</span>
+          <select class="saved-select" id="savedSelAsm" data-tip="Load a saved Assembly script"><option value="">— load —</option></select>
+        </label>
+        <button class="btn sm" type="button" id="btnSaveAsm" data-tip="Save this script to the library (⌘S)">Save</button>
+        <button class="btn sm ghost" type="button" id="btnClearBreaks" data-tip="Remove every breakpoint">Clear breaks</button>
+        <label class="field clock-field" data-tip="This tab's CPU clock (ms per instruction). 0 = instant.">
+          <span class="field-k">Clock</span>
+          <input type="range" id="clockAsmRange" min="0" max="1000" step="1" value="683" aria-label="Assembly clock">
+          <input type="number" class="num" id="clockAsmNum" min="0" step="any" value="180" aria-label="Assembly clock in milliseconds">
+          <span class="unit">ms</span>
+        </label>
+      </div>
+
+      <div class="code-editor" id="asmWrap">
+        <div class="gutter" id="asmGutter" aria-hidden="true"></div>
+        <div class="active-line" id="asmActiveLine" aria-hidden="true" hidden></div>
+        <textarea id="asmEditor" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Assembly program"></textarea>
+      </div>
+
+      <div class="notices">
+        <button class="notice warn" type="button" id="asmForeign" hidden data-tip="These are System commands — the CPU can't execute them. Click to combine both languages in the Hybrid tab.">
+          <span class="notice-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4.5M12 16h.01"/></svg></span>
+          <span class="notice-text">System commands spotted: <b id="asmForeignTokens"></b> — the CPU can't run these.</span>
+          <span class="notice-cta">mix in Hybrid →</span>
+        </button>
+        <button class="notice err" type="button" id="lintBar" hidden data-tip="Click to jump to the first error">
+          <span class="notice-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6m0-6-6 6"/></svg></span>
+          <span class="notice-text" id="lintBarText"></span>
+          <span class="notice-cta">jump →</span>
+        </button>
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" type="button" id="btnRun" data-tip="Run or resume the program (⌘↩)">
+          <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false"><path d="M2.6 1.4 10.4 6 2.6 10.6Z" fill="currentColor"/></svg><span id="btnRunLabel">Run</span>
+        </button>
+        <button class="btn" type="button" id="btnStep" data-tip="Execute one instruction (F10)">Step</button>
+        <button class="btn" type="button" id="btnPause" disabled data-tip="Pause execution (Esc)">Pause</button>
+        <button class="btn" type="button" id="btnReset" data-tip="Reset CPU, memory and console (⇧F5)">Reset</button>
+        <span class="hints"><kbd>⌘↩</kbd> run <kbd>F10</kbd> step <kbd>esc</kbd> pause <kbd>⇧F5</kbd> reset <span class="hint-sep">·</span> click a line number to set a breakpoint</span>
+      </div>
+    </div>
+
+    <!-- System (host) -->
+    <div class="tab-pane" data-pane="host" role="tabpanel" hidden>
+      <div class="toolbar">
+        <span class="field-k strong">Host machine</span>
+        <label class="field">
+          <span class="field-k">Saved</span>
+          <select class="saved-select" id="savedSelHost" data-tip="Load a saved System script"><option value="">— load —</option></select>
+        </label>
+        <button class="btn sm" type="button" id="btnSaveHost" data-tip="Save this script to the library (⌘S)">Save</button>
+        <label class="field" data-tip="The host's own clock — delay between script lines, independent of the CPU. 0 = instant.">
+          <span class="field-k">Pace</span>
+          <input type="number" class="num" id="hostPaceNum" min="0" step="any" value="100" aria-label="Host pace in milliseconds">
+          <span class="unit">ms</span>
+        </label>
+        <label class="field clock-field" data-tip="The CPU clock while this tab is active (ms per instruction).">
+          <span class="field-k">Clock</span>
+          <input type="range" id="clockHostRange" min="0" max="1000" step="1" value="683" aria-label="System tab clock">
+          <input type="number" class="num" id="clockHostNum" min="0" step="any" value="180" aria-label="System tab clock in milliseconds">
+          <span class="unit">ms</span>
+        </label>
+      </div>
+      <div class="notices">
+        <button class="notice warn" type="button" id="hostForeign" hidden data-tip="These are assembly instructions — the host can't run them. Click to combine both in the Hybrid tab.">
+          <span class="notice-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4.5M12 16h.01"/></svg></span>
+          <span class="notice-text">Assembly spotted: <b id="hostForeignTokens"></b> — the host shell can't run these.</span>
+          <span class="notice-cta">mix in Hybrid →</span>
+        </button>
+      </div>
+      <div class="code-editor short" id="hostWrap">
+        <div class="gutter" id="hostGutter" aria-hidden="true"></div>
+        <div class="active-line" id="hostActiveLine" aria-hidden="true" hidden></div>
+        <textarea id="hostEditor" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="System script">; SYSTEM SCRIPT — runs on the host, never on the CPU.
+; Each command is plain JavaScript acting on the machine from above.
+PRINT Hello from outside the machine!
+SET R1 42          ; registers: R1-R4, PC, SP
+FLAG ZF 1          ; flags: ZF, SF
+MEM 0x10 99        ; poke one RAM cell
+FILL 0x20 0x2F 7   ; fill a RAM range
+PEEK 0x10          ; read RAM back
+DUMP 0x20 16       ; hex view of a range
+CLOCK 60           ; the host owns the clock
+; RUN              ; …and execution: RUN PAUSE STEP RESET
+; THEME dark       ; …and every setting: SOUND, VOLUME,
+; GUARD off        ;   MUTE, PITCH, BASE, DEFCLOCK, PIN
+; JS 6 * 7         ; raw JavaScript, evaluated on the host
+HELP</textarea>
+      </div>
+      <pre class="log" id="hostOutput" aria-live="polite"></pre>
+      <div class="controls">
+        <button class="btn primary" type="button" id="btnHostRun" data-tip="Execute the script — plain JavaScript, independent of the CPU (⌘↩)">
+          <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false"><path d="M2.6 1.4 10.4 6 2.6 10.6Z" fill="currentColor"/></svg>Execute
+        </button>
+        <button class="btn" type="button" id="btnHostClear" data-tip="Clear the log">Clear</button>
+        <span class="hints"><kbd>⌘↩</kbd> execute <span class="hint-sep">·</span> HELP lists every command</span>
+      </div>
+    </div>
+
+    <!-- Hybrid -->
+    <div class="tab-pane" data-pane="hybrid" role="tabpanel" hidden>
+      <div class="toolbar">
+        <span class="field-k strong">Hybrid machine</span>
+        <label class="field">
+          <span class="field-k">Saved</span>
+          <select class="saved-select" id="savedSelHybrid" data-tip="Load a saved Hybrid script"><option value="">— load —</option></select>
+        </label>
+        <button class="btn sm" type="button" id="btnSaveHybrid" data-tip="Save this script to the library (⌘S)">Save</button>
+        <label class="field" data-tip="Delay between HOST lines of the hybrid script, independent of the CPU. 0 = instant.">
+          <span class="field-k">Pace</span>
+          <input type="number" class="num" id="hybridPaceNum" min="0" step="any" value="100" aria-label="Hybrid pace in milliseconds">
+          <span class="unit">ms</span>
+        </label>
+        <label class="field clock-field" data-tip="The CPU clock for assembly blocks in this tab (ms per instruction).">
+          <span class="field-k">Clock</span>
+          <input type="range" id="clockHybridRange" min="0" max="1000" step="1" value="683" aria-label="Hybrid tab clock">
+          <input type="number" class="num" id="clockHybridNum" min="0" step="any" value="180" aria-label="Hybrid tab clock in milliseconds">
+          <span class="unit">ms</span>
+        </label>
+      </div>
+      <div class="code-editor short" id="hybridWrap">
+        <div class="gutter" id="hybridGutter" aria-hidden="true"></div>
+        <div class="active-line" id="hybridActiveLine" aria-hidden="true" hidden></div>
+        <textarea id="hybridEditor" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Hybrid script">; HYBRID — both languages, one machine.
+; Assembly blocks run on the CPU exactly as normal;
+; host lines run in plain JavaScript between them. RAM persists.
+PRINT host: seeding RAM with three values
+FILL 0x40 0x41 5
+MEM 0x42 32
+CLOCK 30
+MOV R1, [0x40]
+ADD R1, [0x41]
+ADD R1, [0x42]
+OUT R1
+HLT
+PRINT host: CPU halted — reading the result back
+JS cpu.registers.R1
+DUMP 0x40 4</textarea>
+      </div>
+      <pre class="log" id="hybridOutput" aria-live="polite"></pre>
+      <div class="controls">
+        <button class="btn primary" type="button" id="btnHybridRun" data-tip="Execute the hybrid script — assembly on the CPU, host lines in JavaScript, one shared machine (⌘↩)">
+          <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false"><path d="M2.6 1.4 10.4 6 2.6 10.6Z" fill="currentColor"/></svg>Execute
+        </button>
+        <button class="btn" type="button" id="btnHybridStop" disabled data-tip="Stop the hybrid script">Stop</button>
+        <button class="btn" type="button" id="btnHybridClear" data-tip="Clear the log">Clear</button>
+        <span class="hints">assembly blocks run on the CPU at the live clock <span class="hint-sep">·</span> registers &amp; RAM persist between blocks</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider v" id="dividerV" role="separator" aria-orientation="vertical" aria-label="Resize editor and machine" tabindex="0" data-tip="Drag to resize · double-click to reset"></div>
+
+<!-- ================================ MACHINE ================================ -->
+<section class="panel machine-panel" data-panel="machine" data-home="machine" style="--i:1">
+  <div class="panel-head" data-drag>
+    <span class="panel-title"><span class="led" data-led aria-hidden="true"></span>Machine</span>
+    <span class="spacer"></span>
+    <button class="chip-btn" type="button" id="baseToggle" aria-pressed="false" data-tip="Display base for registers and memory — click to toggle">DEC</button>
+  </div>
+  <div class="panel-body machine-body">
+    <div class="regs" id="regs" aria-label="Registers"></div>
+
+    <div class="tabs-row">
+      <div class="tabs" role="tablist" aria-label="Machine view" data-tabs="machine">
+        <button class="tab" role="tab" type="button" data-tab="memory" aria-selected="true">Memory</button>
+        <button class="tab" role="tab" type="button" data-tab="cpu" aria-selected="false">CPU</button>
+        <span class="tab-ink" aria-hidden="true"></span>
+      </div>
+      <span class="spacer"></span>
+      <div class="flags" id="flags" aria-label="Flags">
+        <button class="flag" type="button" data-flag="ZF" aria-pressed="false" data-tip="Zero flag — set when the last result was 0. Click to toggle.">ZF <b>0</b></button>
+        <button class="flag" type="button" data-flag="SF" aria-pressed="false" data-tip="Sign flag — set when the last result was negative. Click to toggle.">SF <b>0</b></button>
+      </div>
+    </div>
+
+    <div class="tab-pane mem-pane" data-pane="memory" role="tabpanel">
+      <div class="section-k">RAM <span>1024 cells · click a cell, or focus the grid and use the arrow keys · the stack grows down from 0x3FF</span></div>
+      <div class="mem-scroll" id="memScroll"><canvas class="mem-canvas" id="memCanvas" tabindex="0" role="img" aria-label="Memory, 1024 cells. Arrow keys move between cells; Enter or a digit edits the focused cell."></canvas></div>
+      <div class="sr-only" id="memLive" aria-live="polite"></div>
+    </div>
+
+    <div class="tab-pane cpu-pane" data-pane="cpu" role="tabpanel" hidden>
+      <div class="now-card idle" id="nowCard">
+        <div class="now-card-head">
+          <span class="now-card-k">Now executing</span>
+          <span class="now-card-name" id="nowName">—</span>
+          <span class="now-card-patched" id="nowPatched" hidden>patched</span>
+        </div>
+        <div class="now-card-summary" id="nowSummary">idle</div>
+        <div class="now-card-args" id="nowArgs"></div>
+        <pre class="now-card-code" id="nowCode" tabindex="0" data-tip="Click to live-patch this instruction's code"></pre>
+      </div>
+      <div class="section-k">Instruction set <span>click an op to read or patch its code — Apply live-patches the CPU</span></div>
+      <div class="ops" id="cpuOps"></div>
+    </div>
+
+    <div class="tty">
+      <div class="tty-head" id="ttyHead" data-tip="Drag up or down to resize the TTY">
+        <span class="tty-dot" id="ttyDot" aria-hidden="true"></span>
+        <span>TTY0</span>
+        <span class="tty-mode" id="ttyMode">I/O</span>
+      </div>
+      <div class="tty-out" aria-live="polite"><div class="tty-buf" id="console"></div></div>
+      <div class="tty-in" id="ttyInRow">
+        <span class="prompt" aria-hidden="true">›</span>
+        <input type="text" id="ttyInput" disabled placeholder="idle — opens during IN" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="TTY input">
+        <kbd>↩</kbd>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider h" id="dividerH" role="separator" aria-orientation="horizontal" aria-label="Resize manual" tabindex="0" data-tip="Drag to resize · double-click to reset"></div>
+
+<!-- ================================ MANUAL ================================ -->
+<section class="panel manual-panel" data-panel="manual" data-home="manual" style="--i:2">
+  <div class="panel-head" data-drag>
+    <span class="panel-title"><span class="led" data-led aria-hidden="true"></span>Manual</span>
+    <span class="chip" id="opsCount">33 ops</span>
+    <div class="arch" aria-label="Architecture">
+      <span class="arch-pill"><b>CPU</b> R1–R4, PC, SP</span>
+      <span class="arch-pill"><b>Flags</b> ZF, SF</span>
+      <span class="arch-pill"><b>RAM</b> 1024 cells · 0x000–0x3FF</span>
+      <span class="arch-pill"><b>Stack</b> grows down from 0x3FF</span>
+      <span class="arch-pill"><b>Call ABI</b> args R1/R2 · return R1</span>
+    </div>
+    <span class="spacer"></span>
+    <span class="search-wrap"><input type="search" class="search" id="refSearch" placeholder="Search instructions" aria-label="Search the manual (shortcut: slash)" autocomplete="off"><kbd class="search-key" aria-hidden="true">/</kbd></span>
+    <button class="icon-btn sm" type="button" id="manualCollapse" aria-expanded="true" aria-label="Collapse the manual" data-tip="Collapse / expand the manual">
+      <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <div class="panel-body manual-body" id="refScroll"></div>
+</section>
+
+<!-- ================================ FOOTER ================================ -->
+<footer class="app-footer">
+  <div class="foot-brand">Mica <span class="ver">__VERSION__</span></div>
+  <div class="clock-ctrl" id="clockCtrl" data-tip="Clock period for the active tab (ms per instruction). 0 = instant.">
+    <span class="field-k">Clock</span>
+    <input type="range" id="speedRange" min="0" max="1000" step="1" value="683" aria-label="Clock period">
+    <input type="number" class="num" id="speedNum" min="0" step="any" value="180" aria-label="Clock period in milliseconds">
+    <span class="unit" id="speedUnit">ms</span>
+  </div>
+  <div class="foot-pins" id="footPins"></div>
+  <div class="foot-meta">
+    <span class="chip">33 ops</span>
+    <span class="chip">1024 cells</span>
+  </div>
+</footer>
+
+<!-- ================================ SETTINGS ================================ -->
+<div class="scrim" id="drawerScrim" hidden></div>
+<aside class="drawer" id="settingsDrawer" aria-label="Settings" hidden>
+  <div class="drawer-head">
+    <span class="drawer-title">Settings</span>
+    <button class="icon-btn sm" type="button" id="settingsClose" aria-label="Close settings" data-tip="Close (Esc)">
+      <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true" focusable="false"><path d="M2.6 2.6l6.8 6.8M9.4 2.6 2.6 9.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="settingsBody"></div>
+  <div class="drawer-foot">The pin on a row mirrors that control into the footer bar. Everything here is remembered in this browser.</div>
+</aside>
+
+<!-- ================================ MODALS ================================ -->
+<div class="modal-scrim" id="modalScrim" hidden></div>
+
+<div class="modal" id="hybridModal" hidden role="dialog" aria-modal="true" aria-labelledby="hybridModalTitle">
+  <div class="modal-title" id="hybridModalTitle">Combine into Hybrid?</div>
+  <div class="modal-body" id="hybridModalBody"></div>
+  <div class="modal-actions">
+    <button class="btn" type="button" id="hybridModalCancel">Not now</button>
+    <button class="btn primary" type="button" id="hybridModalOk">Make it hybrid</button>
+  </div>
+</div>
+
+<div class="modal" id="scriptModal" hidden role="dialog" aria-modal="true" aria-labelledby="scriptModalTitle">
+  <div class="modal-title" id="scriptModalTitle">Script library</div>
+  <div class="modal-body">
+    <p class="modal-text">Saving from the <b id="scriptModalKind">Assembly</b> tab. Scripts live in this browser — <b>Export</b> writes the whole library to a file you can <b>Import</b> anywhere else.</p>
+    <input type="text" class="text-input" id="scriptNameInput" placeholder="script name…" maxlength="40" autocomplete="off" spellcheck="false" aria-label="Script name">
+    <div class="modal-note" id="scriptModalNote"></div>
+    <div class="script-list" id="scriptList" aria-label="Saved scripts for this tab"></div>
+  </div>
+  <div class="modal-actions">
+    <span class="lib-io">
+      <button class="btn sm ghost" type="button" id="btnExportScripts" data-tip="Download the whole library as mica-scripts.json">Export</button>
+      <button class="btn sm ghost" type="button" id="btnImportScripts" data-tip="Merge a library file into this one">Import</button>
+    </span>
+    <button class="btn" type="button" id="scriptModalCancel">Cancel</button>
+    <button class="btn primary" type="button" id="scriptModalOk">Save</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span class="toast-text" id="toastText"></span>
+  <button class="icon-btn sm" type="button" id="toastClose" aria-label="Dismiss">
+    <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false"><path d="M2.6 2.6l6.8 6.8M9.4 2.6 2.6 9.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<div class="snap-ghost" id="snapGhost" aria-hidden="true" hidden></div>

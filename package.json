@@ -1,0 +1,21 @@
+{
+  "name": "mica",
+  "version": "1.0.0",
+  "description": "A little virtual machine in one HTML file: write assembly for a tiny CPU, run it, step it, watch every register and memory cell, and patch the instruction set while it runs.",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "build:readable": "node tools/build.mjs --readable",
+    "check": "node tools/check.mjs",
+    "test": "node test/run.mjs",
+    "test:webkit": "node test/run.mjs --webkit",
+    "screenshots": "node tools/screenshots.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "Unlicense"
+}

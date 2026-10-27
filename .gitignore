@@ -1,0 +1,13 @@
+# Dependencies and the compiled WebKit runner (node_modules/.cache/mica/)
+node_modules/
+npm-debug.log*
+
+# A baseline build for tools/perf/harness.html
+tools/perf/baseline.html
+
+# OS and editor leftovers
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Mica — a little virtual machine. Write, run, step and live-debug assembly for a tiny CPU, right in your browser.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#dff3fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1a26" media="(prefers-color-scheme: dark)">
+<title>Mica — a little virtual machine</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2.5' y='9' width='12' height='12' rx='3.2' fill='%230d8fb6' opacity='.38'/%3E%3Crect x='6' y='6' width='12' height='12' rx='3.2' fill='%230d8fb6' opacity='.66'/%3E%3Crect x='9.5' y='3' width='12' height='12' rx='3.2' fill='%230d8fb6'/%3E%3C/svg%3E">
+<script>
+/* Apply the remembered theme before first paint so there is no flash.
+   Falls back to the key written by pre-release builds (nanoos-theme), then
+   to the system preference. */
+(function () {
+  var t = null;
+  try {
+    t = localStorage.getItem('mica:theme') || localStorage.getItem('nanoos-theme');
+  } catch (e) {}
+  if (t !== 'dark' && t !== 'light') {
+    t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  document.documentElement.setAttribute('data-theme', t);
+  /* No transitions until the first frame has painted (removed by the app), and
+     the entrance fade only when the page is actually on screen: a page loaded
+     in a background tab would otherwise keep its fade-ins frozen. */
+  document.documentElement.classList.add('preload');
+  if (document.visibilityState !== 'hidden') document.documentElement.classList.add('boot');
+  try {
+    var m = localStorage.getItem('mica:motion');
+    if (m === 'reduce') document.documentElement.setAttribute('data-motion', 'reduce');
+  } catch (e) {}
+})();
+</script>
+<style>

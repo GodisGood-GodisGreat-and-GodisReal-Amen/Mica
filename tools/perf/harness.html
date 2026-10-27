@@ -1,0 +1,34 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>A/B harness</title>
+<style>
+  html, body { margin: 0; background: #1b1f24; overflow: hidden; }
+  .wrap { display: flex; gap: 0; }
+  .cell { width: 720px; height: 450px; overflow: hidden; position: relative; }
+  iframe { width: 1440px; height: 900px; border: 0; transform: scale(.5); transform-origin: 0 0; position: absolute; top: 0; left: 0; }
+</style>
+<div class="wrap">
+  <div class="cell"><iframe id="a"></iframe></div>
+  <div class="cell"><iframe id="b"></iframe></div>
+</div>
+<script>
+  /* Two builds side by side in one renderer, so both get the same CPU priority:
+     tools/perf/harness.html?a=baseline.html&b=../../mica.html (paths relative to
+     this page; serve the repository root over http so both frames are same-origin).
+     inject('a') loads bench.js into a frame; B('a') is that frame's __bench. */
+  const q = new URLSearchParams(location.search);
+  document.getElementById('a').src = q.get('a') || 'baseline.html';
+  document.getElementById('b').src = q.get('b') || '../../mica.html';
+  const bench = new URL('bench.js', location.href).href;
+  window.inject = async id => {
+    const w = document.getElementById(id).contentWindow;
+    await new Promise((res, rej) => {
+      const s = w.document.createElement('script');
+      s.src = bench + '?' + Date.now();
+      s.onload = res; s.onerror = rej;
+      w.document.head.appendChild(s);
+    });
+    return w.__benchApp;
+  };
+  window.B = id => document.getElementById(id).contentWindow.__bench;
+</script>
