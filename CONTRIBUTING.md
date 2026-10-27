@@ -39,6 +39,7 @@ Then open `mica.html`. After each change in `src/`, run `npm run build` again an
 | `tools/perf/` | benchmark scenarios and a page that runs two builds side by side |
 | `test/suite.js` | the functional tests, which run inside the page |
 | `test/run.mjs` | opens the page in a browser, runs the suite and reports |
+| `.github/workflows/` | `check.yml` runs the checks and tests on every push and pull request; `pages.yml` then publishes `mica.html` as the website |
 
 [How it works](docs/architecture.md) explains the code section by section.
 
@@ -57,7 +58,7 @@ Then open `mica.html`. After each change in `src/`, run `npm run build` again an
 
 `npm test` runs `test/suite.js` in a fresh page, in headless Chrome, and prints one line per check. Each check drives the interface like a person would and reads the result from the page, so a check that passes means the visible feature works. When you add a feature, add a check for it in the same style; when you fix a bug, add the check that would have caught it.
 
-On a Mac, `npm run test:webkit` runs the same suite in Safari's engine. GitHub Actions runs `npm run check` and both test runs on every push and pull request.
+On a Mac, `npm run test:webkit` runs the same suite in Safari's engine, and `node test/run.mjs --page <address>` runs it against a copy on the web, such as [the website](https://godisgood-godisgreat-and-godisreal-amen.github.io/Mica/), in Chrome. GitHub Actions runs `npm run check` and both test runs on every push and pull request. When they pass on `main`, it publishes `mica.html` as the website.
 
 ## Debugging
 

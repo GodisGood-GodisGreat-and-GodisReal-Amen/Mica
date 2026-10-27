@@ -4,9 +4,10 @@
      node test/run.mjs                    headless Chrome, Chromium or Edge
      node test/run.mjs --webkit           WebKit, Safari's engine, offscreen (macOS)
      node test/run.mjs --page build.html  test another build of the page
+     node test/run.mjs --page https://…   test a copy on the web (Chrome only)
 
    CHROME=/path/to/browser picks the browser. Every run starts from empty
-   storage, like a first visit, and opens the page from a file:// URL, like a
+   storage, like a first visit, and opens a file from a file:// URL, like a
    double-click. The exit code is 1 when a check fails. */
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -18,7 +19,9 @@ import { webshot } from '../tools/webkit.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const arg = name => { const i = args.indexOf(name); return i < 0 ? null : args[i + 1]; };
-const page = path.resolve(arg('--page') || path.join(ROOT, 'mica.html'));
+const target = arg('--page') || path.join(ROOT, 'mica.html');
+const isUrl = /^https?:\/\//.test(target);
+const page = isUrl ? target : path.resolve(target);
 const suite = readFileSync(path.join(ROOT, 'test', 'suite.js'), 'utf8');
 const WIDTH = 1440, HEIGHT = 900;
 
@@ -101,7 +104,7 @@ async function inChrome() {
     await send('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false });
     await send('Page.addScriptToEvaluateOnNewDocument', { source: TRAP });
     const loaded = cdp.once('Page.loadEventFired', sessionId);
-    await send('Page.navigate', { url: pathToFileURL(page).href });
+    await send('Page.navigate', { url: isUrl ? page : pathToFileURL(page).href });
     await loaded;
     const r = await send('Runtime.evaluate', { expression: `${suite}\n__micaTests()`, awaitPromise: true, returnByValue: true });
     if (r.exceptionDetails) throw new Error('the suite itself failed: ' + (r.exceptionDetails.exception?.description || r.exceptionDetails.text));
@@ -117,6 +120,7 @@ async function inChrome() {
 }
 
 async function inWebKit() {
+  if (isUrl) throw new Error('--webkit opens local files only: download the page first');
   const plan = { width: WIDTH, height: HEIGHT, preload: TRAP, steps: [{ js: `${suite}\nreturn JSON.stringify(await __micaTests());` }] };
   const out = await webshot(page, plan);
   const line = out.split('\n').find(l => l.startsWith('[0] '));

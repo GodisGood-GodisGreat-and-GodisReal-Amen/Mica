@@ -100,7 +100,7 @@ Each row of `OP_TABLE` holds an instruction's name, operand count, syntax, summa
 
 ## Tests
 
-`test/suite.js` runs inside the page and drives Mica as a person would, with clicks, typing and keys, then reads the results back from the page. It never touches the app's internals. `test/run.mjs` opens `mica.html` from disk, with empty storage, either in headless Chrome, which it drives over the DevTools protocol with Node's built-in WebSocket, or in WebKit through `tools/webshot.swift`, a small offscreen `WKWebView` runner for macOS. GitHub Actions runs `npm run check` and the suite in Chrome on Linux and in WebKit on macOS, on every push and pull request.
+`test/suite.js` runs inside the page and drives Mica as a person would, with clicks, typing and keys, then reads the results back from the page. It never touches the app's internals. `test/run.mjs` opens `mica.html` from disk, with empty storage, either in headless Chrome, which it drives over the DevTools protocol with Node's built-in WebSocket, or in WebKit through `tools/webshot.swift`, a small offscreen `WKWebView` runner for macOS. GitHub Actions runs `npm run check` and the suite in Chrome on Linux and in WebKit on macOS, on every push and pull request. When they pass on `main`, `.github/workflows/pages.yml` publishes `mica.html` as the GitHub Pages site, as its `index.html`.
 
 ## Measuring performance
 

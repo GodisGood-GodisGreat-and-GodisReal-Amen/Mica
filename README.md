@@ -2,7 +2,7 @@
 
 A little virtual machine that runs in your browser. Write assembly for a tiny CPU, run it, step through it one instruction at a time, set breakpoints, and watch the registers, the flags and all 1,024 memory cells change as it goes. Every instruction is a few lines of JavaScript that you can read and rewrite while a program runs, and two more tabs drive the machine from outside: one with plain commands, one that mixes those commands with assembly in a single script.
 
-Mica is one HTML file with nothing to install: download it, double-click it, and it opens in your browser. It makes no network requests and keeps your programs and settings in your browser's own storage.
+Mica is one HTML file with nothing to install. [Use it online](https://godisgood-godisgreat-and-godisreal-amen.github.io/Mica/), or download the file and double-click it: it opens in your browser, offline too. It makes no network requests of its own and keeps your programs and settings in your browser's storage.
 
 ![Mica running its kernel: the shell's source in the editor, the registers, memory and TTY on the right, the manual below](docs/images/mica.png)
 
@@ -24,7 +24,7 @@ Mica is one HTML file with nothing to install: download it, double-click it, and
 
 ## Quick start
 
-Download `mica.html` from the [latest release](https://github.com/GodisGood-GodisGreat-and-GodisReal-Amen/Mica/releases/latest) and open it in Safari, Chrome, Edge or Firefox. That is all: the file is the whole app, about 170 KB. Pick an example, press **Run**, and the [startup guide](docs/getting-started.md) takes it from there.
+Open **<https://godisgood-godisgreat-and-godisreal-amen.github.io/Mica/>** in Safari, Chrome, Edge or Firefox. For a copy of your own that also works offline, download `mica.html` from the [latest release](https://github.com/GodisGood-GodisGreat-and-GodisReal-Amen/Mica/releases/latest) and double-click it: the file is the whole app, about 170 KB. Pick an example, press **Run**, and the [startup guide](docs/getting-started.md) takes it from there.
 
 To work on the code you need [Node.js](https://nodejs.org) 22 or newer:
 
@@ -56,7 +56,7 @@ Mica needs Safari 16.4, Chrome or Edge 105, Firefox 113, or anything newer. Ever
 
 ## Privacy and network use
 
-Mica makes no network requests of its own: no fonts, scripts, analytics or update checks. The one exception is a command you type yourself, `BACKDROP url <link>`, which shows an image from that address, so your browser fetches it. Your settings, the three editors' text, the script library, a backdrop photo and a custom beep are kept in your browser's local storage, under keys that start with `mica:`. **Export** in the script library writes your scripts to a file of your choosing. Nothing else leaves your computer.
+Mica makes no network requests of its own: no fonts, scripts, analytics or update checks. The one exception is a command you type yourself, `BACKDROP url <link>`, which shows an image from that address, so your browser fetches it. Your settings, the three editors' text, the script library, a backdrop photo and a custom beep are kept in your browser's local storage, under keys that start with `mica:`. **Export** in the script library writes your scripts to a file of your choosing. Nothing else leaves your computer. The online copy is the same file, served by GitHub Pages: GitHub sees the visit as any web host would, and the page sends nothing after that. It keeps its own storage, apart from a downloaded copy's.
 
 ## License
 

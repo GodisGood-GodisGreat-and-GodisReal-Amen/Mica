@@ -1,7 +1,7 @@
 # Troubleshooting
 
 **Nothing is remembered between visits.**
-Mica saves to the browser's local storage for the page's address. A private window throws it away when it closes, and some privacy settings clear site data when the browser quits. A copy of Mica opened from a different address, a web server instead of the file for example, or in another browser, has storage of its own. To carry your scripts anywhere, use **Export** and **Import** in the script library (**Save**, or ⌘S).
+Mica saves to the browser's local storage for the page's address. A private window throws it away when it closes, and some privacy settings clear site data when the browser quits. The online copy and a downloaded file have different addresses, so each has storage of its own, and so does each browser. To carry your scripts anywhere, use **Export** and **Import** in the script library (**Save**, or ⌘S).
 
 **Choosing the kernel says "This example could not be opened in this browser".**
 The kernel is stored compressed and unpacked by the browser, which needs Safari 16.4, Chrome or Edge 103, Firefox 113, or newer. Update the browser. The other examples work everywhere.

@@ -14,13 +14,15 @@ To use Mica you need only the browser.
 
 ## 2. Get Mica
 
-Download `mica.html` from the [latest release](https://github.com/GodisGood-GodisGreat-and-GodisReal-Amen/Mica/releases/latest). If you clone the repository instead, the same file is at its root, always built from the current source.
+Mica runs online at <https://godisgood-godisgreat-and-godisreal-amen.github.io/Mica/>. Open that address and skip to [your first program](#4-your-first-program).
+
+For a copy of your own, which also works offline, download `mica.html` from the [latest release](https://github.com/GodisGood-GodisGreat-and-GodisReal-Amen/Mica/releases/latest). If you clone the repository instead, the same file is at its root, always built from the current source.
 
 ## 3. Open it
 
 Double-click `mica.html`. It opens in your default browser as a local file: there is nothing to install and no server to start. You can also drag the file onto a browser window, or put it on any web server or static host and open it from there.
 
-Mica remembers your programs and settings in the browser's storage for the page's address. A copy served from somewhere else, or opened in another browser, has storage of its own and starts fresh (section 7 has the details).
+Mica remembers your programs and settings in the browser's storage for the page's address. The online copy and a downloaded file have different addresses, so each keeps its own, as does each browser (section 7 has the details).
 
 ## 4. Your first program
 
@@ -94,7 +96,7 @@ Everything is saved in your browser's local storage, under keys that start with 
 
 ## 8. Updating
 
-Download the new `mica.html` and put it where the old one was, under the same name. Opened from the same address, it finds your work where the old one left it. If you move it, carry your scripts across with **Export** and **Import**. In a clone, `git pull` brings the new `mica.html`.
+The online copy is kept up to date for you. For a downloaded file, download the new `mica.html` and put it where the old one was, under the same name. Opened from the same address, it finds your work where the old one left it. If you move it, carry your scripts across with **Export** and **Import**. In a clone, `git pull` brings the new `mica.html`.
 
 ## 9. Building from source
 
