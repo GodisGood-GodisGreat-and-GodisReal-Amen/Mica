@@ -158,6 +158,59 @@ async function __micaTests() {
     await type('q');
     await until(() => status() === 'HALTED');
   });
+  /* The line numbers and the coloured text are drawn over a textarea whose own
+     text is invisible, so they must sit exactly on its lines, and never where it
+     cannot show text. The style stands in for a Mac set to show scroll bars
+     always (headless browsers hide theirs) and for Safari's Zoom Text Only,
+     which makes every line taller. Uses the kernel left in the editor. */
+  await check('line numbers and colours stay on their lines down to the last one', async () => {
+    const ta = byId('asmEditor');
+    expect(ta.value.includes('MSH — Mica Shell v1'), 'the kernel is not in the editor');
+    const lines = ta.value.split('\n');
+    /* the part of an element that its clipping ancestors let through */
+    const shown = el => {
+      let { top, bottom } = el.getBoundingClientRect();
+      for (let p = el.parentElement; p; p = p.parentElement) {
+        if (getComputedStyle(p).overflow === 'visible') continue;
+        const r = p.getBoundingClientRect();
+        top = Math.max(top, r.top); bottom = Math.min(bottom, r.bottom);
+      }
+      return { top, bottom };
+    };
+    /* every number and coloured row in view, against the line the textarea draws there */
+    const problems = () => {
+      const cs = getComputedStyle(ta), lh = parseFloat(cs.lineHeight), box = ta.getBoundingClientRect();
+      const origin = box.top + ta.clientTop + parseFloat(cs.paddingTop) - ta.scrollTop, end = box.top + ta.clientTop + ta.clientHeight;
+      const out = [];
+      for (const el of $$('#asmWrap .ln[data-line], #asmWrap .hl-line')) {
+        const v = shown(el);
+        if (v.bottom - v.top < 1) continue;
+        const top = el.getBoundingClientRect().top, line = Math.round((top - origin) / lh);
+        const isNumber = el.classList.contains('ln'), what = isNumber ? `number ${el.textContent}` : `colour row "${el.textContent}"`;
+        if (v.bottom > end + 0.5) out.push(`${what} shows below the text area`);
+        if (Math.abs(top - origin - line * lh) > 0.5) out.push(`${what} is ${(top - origin - line * lh).toFixed(1)}px off its line`);
+        else if (isNumber ? el.textContent !== String(line + 1) : el.textContent !== (lines[line] || '')) out.push(`${what} sits on line ${line + 1}`);
+      }
+      return out.slice(0, 4);
+    };
+    document.head.insertAdjacentHTML('beforeend', '<style id="tStrip">#asmEditor, #asmWrap .hl { line-height: 23px } #asmEditor { border: solid transparent; border-width: 0 14px 14px 0 }</style>');
+    try {
+      for (const [where, y] of [['halfway', 0.5], ['short of the end', 1]]) {
+        ta.scrollTop = Math.round((ta.scrollHeight - ta.clientHeight) * y) - 37;
+        await until(() => !problems().length, 2000);
+        same(problems(), [], where);
+      }
+      ta.scrollTop = ta.scrollHeight;
+      await until(() => !problems().length, 2000);
+      same(problems(), [], 'at the end');
+      const numbers = $$('#asmWrap .ln[data-line]').filter(el => { const v = shown(el); return v.bottom - v.top >= 1; });
+      same(numbers[numbers.length - 1].textContent, String(lines.length), 'last number in view at the end');
+    } finally {
+      byId('tStrip').remove();
+      ta.scrollTop = 0;
+      await until(() => !problems().length, 2000);
+    }
+  });
 
   /* ---- running, stepping, breakpoints ------------------------------------ */
   await check('literals, labels and indirect operands', async () => {

@@ -1436,11 +1436,15 @@ function makeEditor({ textarea, gutter, activeLine, clickable, mode }) {
   /* The gutter is virtualised: only the line numbers in view exist (about 40
      recycled rows), so typing, scrolling and resizing cost the same for a
      2,000-line program as for a 10-line one. */
-  const LH = 20, PAD = 10; /* must match the textarea's line-height and top padding */
   const inner = h('div', { class: 'gutter-inner' });
-  gutter.append(inner);
+  /* The numbers stop where the textarea's text stops: a scroll bar that takes
+     room hides the last lines' text, so it must hide their numbers too. */
+  gutter.append(h('div', { class: 'gutter-clip' }, inner));
   if (clickable) gutter.classList.add('clickable');
   const rows = [];
+  /* Where the textarea draws its lines is read from it (see measure), never
+     assumed: Safari's Zoom Text Only, for one, makes every line taller. */
+  let LH = 20, PAD = 10, bandX = -1, bandY = -1;
   let lineCount = 1, scrollY = 0, scrollX = 0, viewH = 0, lines = [''];
   /* highlight layer: the textarea keeps the caret and selection, its text is
      transparent, and the coloured copy of the visible lines sits underneath */
@@ -1521,10 +1525,35 @@ function makeEditor({ textarea, gutter, activeLine, clickable, mode }) {
     if (prev !== active) { refreshLine(prev); refreshLine(active); }
     positionActive();
   }
-  function measure() { viewH = gutter.clientHeight; paint(false); paintHL(false); }
-  new ResizeObserver(entries => { const hgt = entries[0].contentRect.height; if (hgt !== viewH) { viewH = hgt; paint(false); paintHL(false); } }).observe(gutter);
-  /* scroll offsets are cached here, so rendering never has to read them (a forced layout) */
-  textarea.addEventListener('scroll', () => { scrollY = textarea.scrollTop; scrollX = textarea.scrollLeft; paint(false); paintHL(false); positionActive(); }, { passive: true });
+  /* Reads the line height, the top padding, the height of the text area and
+     the strips that scroll bars take at the bottom and right, which the
+     numbers and the coloured copy must leave alone. Runs on resize, when a tab
+     shows and once a scroll settles; drawing never reads layout. */
+  function measure() {
+    const cs = getComputedStyle(textarea);
+    const lh = parseFloat(cs.lineHeight) || 20;
+    const bx = textarea.offsetHeight - textarea.clientTop - textarea.clientHeight;
+    const by = textarea.offsetWidth - textarea.clientLeft - textarea.clientWidth;
+    PAD = textarea.clientTop + (parseFloat(cs.paddingTop) || 0);
+    viewH = textarea.clientHeight;
+    if (lh !== LH || bx !== bandX || by !== bandY) {
+      LH = lh; bandX = bx; bandY = by;
+      const st = textarea.parentElement.style;
+      st.setProperty('--lh', lh + 'px'); st.setProperty('--band-x', bx + 'px'); st.setProperty('--band-y', by + 'px');
+    }
+    paint(true); paintHL(true); positionActive();
+  }
+  /* the textarea's box shrinks when a scroll bar appears, so this sees that too */
+  new ResizeObserver(measure).observe(textarea);
+  /* Scroll offsets are cached here, so rendering never has to read them (a
+     forced layout). Once scrolling stops, everything is read again: an elastic
+     bounce or a zoom can still move the text after the last scroll event. */
+  let settle = 0;
+  textarea.addEventListener('scroll', () => {
+    scrollY = textarea.scrollTop; scrollX = textarea.scrollLeft; paint(false); paintHL(false); positionActive();
+    clearTimeout(settle);
+    settle = setTimeout(() => { scrollY = textarea.scrollTop; scrollX = textarea.scrollLeft; measure(); }, 150);
+  }, { passive: true });
   textarea.addEventListener('input', () => { readLines(); paintHL(true); });
   textarea.addEventListener('keydown', e => {
     if (e.key === 'Tab' && !e.metaKey && !e.ctrlKey && !e.altKey) {

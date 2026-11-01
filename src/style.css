@@ -485,10 +485,13 @@ kbd {
   position: relative; z-index: 2; width: 46px; flex: 0 0 46px; overflow: hidden; contain: strict;
   border-right: 1px solid var(--stroke-soft); background: var(--gutter-bg); user-select: none; -webkit-user-select: none;
 }
+/* --lh, --band-x and --band-y are measured from the textarea: its line height
+   and the strips its scroll bars take at the bottom and right */
+.gutter-clip { position: absolute; left: 0; right: 0; top: 0; bottom: var(--band-x, 0px); overflow: hidden; }
 .gutter-inner { will-change: transform; }
 .ln.blank { pointer-events: none; }
 .ln {
-  position: relative; height: 20px; padding-right: 9px;
+  position: relative; height: var(--lh, 20px); padding-right: 9px;
   font: 500 11px/20px var(--font-mono); text-align: right; color: var(--text-3); cursor: pointer;
 }
 .ln::before {
@@ -504,17 +507,17 @@ kbd {
 .ln.err { color: var(--err); font-weight: 600; }
 .ln.active { color: var(--accent); font-weight: 600; }
 .active-line {
-  position: absolute; z-index: 1; left: 46px; right: 0; top: 0; height: 20px;
+  position: absolute; z-index: 1; left: 46px; right: var(--band-y, 0px); top: 0; height: var(--lh, 20px);
   background: var(--accent-soft); border-left: 2px solid var(--accent); pointer-events: none; will-change: transform;
 }
 body[data-pace="slow"] .active-line { transition: transform 150ms var(--ease-out); }
 .hl {
-  position: absolute; z-index: 2; left: 46px; right: 0; top: 0; bottom: 0; padding: 0 12px;
+  position: absolute; z-index: 2; left: 46px; right: var(--band-y, 0px); top: 0; bottom: var(--band-x, 0px); padding: 0 12px;
   overflow: hidden; pointer-events: none; contain: strict;
   font: 500 12.5px/20px var(--font-mono); color: var(--text); white-space: pre; tab-size: 4;
 }
 .hl-inner { will-change: transform; }
-.hl-line { height: 20px; }
+.hl-line { height: var(--lh, 20px); }
 .code-editor textarea.hl-on { color: transparent; -webkit-text-fill-color: transparent; }
 .code-editor textarea.hl-on::selection { color: transparent; -webkit-text-fill-color: transparent; background: var(--sel); }
 .t-o { color: var(--syn-op); }
