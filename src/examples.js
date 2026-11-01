@@ -1173,7 +1173,7 @@ HLT
 ;; INSTRUCTION SET — single-cell unless noted
 ;;
 ;; 0..9 push that digit
-;; + - * / pop b, pop a, push (a op b)
+;; + - * / pop b, pop a, push (a op b); a / 0 gives 0
 ;; = equal: push 1 if a==b else 0
 ;; ? less-than: push 1 if a<b else 0
 ;; d dup top
@@ -1622,6 +1622,7 @@ CALL vm_push
 CALL vm_advance
 RET
 vm_div_zero:
+CALL vm_pop ; drop a as well: a / 0 leaves just 0
 MOV R1, 0
 CALL vm_push
 CALL vm_advance

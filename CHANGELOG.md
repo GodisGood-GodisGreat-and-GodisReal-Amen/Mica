@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **MPL division by zero**: in the kernel's stack language, `7 0 /` now leaves just 0 on the stack, like any other division; it used to leave the 7 underneath.
+
 ## 1.0.0 — 2026-10-28
 
 The first public release.

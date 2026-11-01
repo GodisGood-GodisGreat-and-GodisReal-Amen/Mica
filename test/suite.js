@@ -145,6 +145,19 @@ async function __micaTests() {
     await until(() => status() === 'HALTED');
     same(status(), 'HALTED', 'status after q');
   });
+  /* Runs the kernel the previous check left in the editor. */
+  await check('MPL divides by zero to 0 and keeps the stack balanced', async () => {
+    byId('btnReset').click();
+    byId('btnRun').click();
+    await until(() => status() === 'AWAITING INPUT');
+    for (const cell of ['p', '5', '7', '0', '/', 'S', 'H']) await type(cell);
+    const from = tty().length;
+    await type('x');
+    await until(() => tty().slice(from).includes('msh> '));
+    same((/\[.*?\]/.exec(tty().slice(from)) || [])[0], '[0]', 'stack after 7 0 /');
+    await type('q');
+    await until(() => status() === 'HALTED');
+  });
 
   /* ---- running, stepping, breakpoints ------------------------------------ */
   await check('literals, labels and indirect operands', async () => {
