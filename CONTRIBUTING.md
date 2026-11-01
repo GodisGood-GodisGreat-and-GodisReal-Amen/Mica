@@ -17,7 +17,7 @@ Then open `mica.html`. After each change in `src/`, run `npm run build` again an
 | --- | --- |
 | `npm run build` | builds `mica.html` from `src/` |
 | `npm run build:readable` | the same, unminified, with the kernel example left as text |
-| `npm run check` | syntax of every script, `mica.html` up to date, the version in the changelog, links in the docs |
+| `npm run check` | syntax of every script, `mica.html` up to date, the version in the changelog, links in the docs, a check for every fixed bug |
 | `npm test` | the browser tests in headless Chrome, Chromium or Edge (`CHROME=/path` picks one) |
 | `npm run test:webkit` | the same tests in WebKit, Safari's engine (macOS, needs `swiftc`) |
 | `npm run screenshots` | renders the pictures in `docs/images/` (macOS) |
@@ -38,6 +38,7 @@ Then open `mica.html`. After each change in `src/`, run `npm run build` again an
 | `tools/screenshots.mjs` | the pictures in `docs/images/` |
 | `tools/perf/` | benchmark scenarios and a page that runs two builds side by side |
 | `test/suite.js` | the functional tests, which run inside the page |
+| `test/fixed-bugs.md` | every fixed bug, with the check that keeps it fixed |
 | `test/run.mjs` | opens the page in a browser, runs the suite and reports |
 | `.github/workflows/` | `check.yml` runs the checks and tests on every push and pull request; `pages.yml` then publishes `mica.html` as the website |
 
@@ -56,7 +57,9 @@ Then open `mica.html`. After each change in `src/`, run `npm run build` again an
 
 ## Testing
 
-`npm test` runs `test/suite.js` in a fresh page, in headless Chrome, and prints one line per check. Each check drives the interface like a person would and reads the result from the page, so a check that passes means the visible feature works. When you add a feature, add a check for it in the same style; when you fix a bug, add the check that would have caught it.
+`npm test` runs `test/suite.js` in a fresh page, in headless Chrome, and prints one line per check. Each check drives the interface like a person would and reads the result from the page, so a check that passes means the visible feature works. When you add a feature, add a check for it in the same style.
+
+When you fix a bug, first write the check that would have caught it and watch it fail on the old build; then fix the bug, see the check pass, and list the bug with its check in [test/fixed-bugs.md](test/fixed-bugs.md). `npm run check` fails if a listed check ever goes missing. Never delete or loosen one of those checks to make a change pass: if a change really needs that behaviour to work differently, change the check on purpose, update its line, and say why in the commit message. Checks wait for what they need with `until()` rather than for a fixed time, because a busy test machine can be many times slower than yours.
 
 On a Mac, `npm run test:webkit` runs the same suite in Safari's engine, and `node test/run.mjs --page <address>` runs it against a copy on the web, such as [the website](https://godisgood-godisgreat-and-godisreal-amen.github.io/Mica/), in Chrome. GitHub Actions runs `npm run check` and both test runs on every push and pull request. When they pass on `main`, it publishes `mica.html` as the website.
 

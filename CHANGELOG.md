@@ -4,6 +4,7 @@
 
 - **MPL division by zero**: in the kernel's stack language, `7 0 /` now leaves just 0 on the stack, like any other division; it used to leave the 7 underneath.
 - **The editor with scroll bars always shown**: line numbers and coloured code no longer run under the editor's scroll bar, so the end of a long program shows in full and every number sits on its line. With Safari's Zoom Text Only, the numbers no longer drift off their lines.
+- **Fixed bugs stay fixed**: each one is listed in `test/fixed-bugs.md` with the check that guards it, and `npm run check` fails if a check goes missing.
 
 ## 1.0.0 — 2026-10-28
 

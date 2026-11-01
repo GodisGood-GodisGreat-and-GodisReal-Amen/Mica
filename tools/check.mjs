@@ -5,7 +5,8 @@
    - mica.html is exactly what src/ builds to (the deflated kernel is compared
      after inflating, so a different zlib can never fail the check)
    - the version in package.json is the newest entry in CHANGELOG.md
-   - every relative link and image in the Markdown files points at a file */
+   - every relative link and image in the Markdown files points at a file
+   - every bug in test/fixed-bugs.md still has its check in test/suite.js */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -54,8 +55,17 @@ for (const doc of docs) {
   }
 }
 
+/* 5. fixed bugs keep their checks, so no later change can quietly bring one back */
+const suiteText = readFileSync(path.join(ROOT, 'test', 'suite.js'), 'utf8');
+const guards = readFileSync(path.join(ROOT, 'test', 'fixed-bugs.md'), 'utf8').split('\n')
+  .map(line => /\|\s*`([^`]+)`\s*\|\s*$/.exec(line)).filter(Boolean).map(m => m[1]);
+if (!guards.length) problems.push('test/fixed-bugs.md lists no checks');
+for (const name of guards) {
+  if (!['\'', '"', '`'].some(q => suiteText.includes(`check(${q}${name}${q}`))) problems.push(`test/fixed-bugs.md lists the check "${name}", which test/suite.js no longer has`);
+}
+
 if (problems.length) {
   console.error(problems.map(p => '✗ ' + p).join('\n'));
   process.exit(1);
 }
-console.log(`✓ ${scripts.length} scripts parse · mica.html matches src/ · version ${version} · links in ${docs.length} documents resolve`);
+console.log(`✓ ${scripts.length} scripts parse · mica.html matches src/ · version ${version} · links in ${docs.length} documents resolve · ${guards.length} fixed bugs keep their checks`);
