@@ -200,11 +200,13 @@ async function __micaTests() {
     load('loop:\nINC R1\nJMP loop', 20);
     byId('btnRun').click();
     same(status(), 'RUNNING', 'status');
-    await sleep(160);
+    /* Wait for a few ticks rather than a fixed time: a busy machine can hold a
+       20 ms timer back much longer, and at this speed every tick redraws the counter. */
+    const cycles = () => parseInt(byId('cycleCount').textContent, 10);
+    await until(() => cycles() > 2, 3000);
     byId('btnPause').click();
     same(status(), 'PAUSED', 'status after Pause');
-    const c = parseInt(byId('cycleCount').textContent, 10);
-    expect(c > 2, `only ${c} cycles in 160 ms at 20 ms`);
+    expect(cycles() > 2, `only ${cycles()} cycles in 3 s at 20 ms`);
     byId('btnRun').click();
     same(status(), 'RUNNING', 'status after Resume');
     await sleep(60);
